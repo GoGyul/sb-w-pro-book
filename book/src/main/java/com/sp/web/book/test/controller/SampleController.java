@@ -1,5 +1,7 @@
 package com.sp.web.book.test.controller;
 
+import com.sp.web.book.common.error.CommonErrorCode;
+import com.sp.web.book.common.exception.RestApiException;
 import com.sp.web.book.test.dto.SampleDto;
 import lombok.extern.log4j.Log4j;
 import lombok.extern.log4j.Log4j2;
@@ -33,6 +35,16 @@ public class SampleController {
         dto.setId("2");
         dto.setName("inDto");
         return dto;
+    }
+
+    @RequestMapping("/errorType01")
+    public void errorTest01() {
+        throw new NullPointerException("Something went wrong!");
+    }
+
+    @RequestMapping("/errorType02")
+    public void errorTest02() {
+        throw new RestApiException(CommonErrorCode.INVALID_FORMAT_ERROR);
     }
 
 }

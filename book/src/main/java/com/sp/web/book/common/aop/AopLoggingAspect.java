@@ -1,4 +1,4 @@
-package com.sp.web.book.aop;
+package com.sp.web.book.common.aop;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;

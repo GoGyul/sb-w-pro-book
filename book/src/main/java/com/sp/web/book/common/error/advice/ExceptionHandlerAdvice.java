@@ -43,7 +43,7 @@ public class ExceptionHandlerAdvice {
 
     }
 
-    //@Valid 유효성 검사에서 예외가 발생했을 때 -> requestbody에 잘못 들어왔을 때.
+    //@Valid 유효성 검사에서 예외가 발생했을 때 -> requestbody에 잘못 들어왔을 때
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
         log.error("[MethodArgumentNotValidException] cause: {}, message: {}",NestedExceptionUtils.getMostSpecificCause(e),e.getMessage());

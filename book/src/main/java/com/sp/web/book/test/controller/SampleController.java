@@ -13,12 +13,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Log4j2
-@RequestMapping("/sample")
+@RequestMapping("/board")
 public class SampleController {
 
     @RequestMapping("")
     public void sample() {
         log.info("sample");
+    }
+
+    @GetMapping("/load")
+    public SampleDto load() {
+        SampleDto dto = new SampleDto();
+        dto.setId("1");
+        dto.setName("name");
+        return dto;
     }
 
     @GetMapping("/ex01")

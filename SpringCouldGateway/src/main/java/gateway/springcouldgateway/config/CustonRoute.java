@@ -11,7 +11,7 @@ public class CustonRoute {
     @Bean
     public RouteLocator cRouter(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("ms1", r -> r.path("/sample/**")
+                .route("ms1", r -> r.path("/board/**")
                         .uri("http://localhost:8081"))
                 .route("ms2",r->r.path("/user/**")
                         .uri("http://localhost:8082"))

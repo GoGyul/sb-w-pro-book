@@ -22,7 +22,7 @@ public class JwtAuthfilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         ServerHttpRequest request = (ServerHttpRequest) exchange.getRequest();
 
-        if(request.getURI().getPath().equals("/user/login")) {
+        if(request.getURI().getPath().equals("/user/**")) {
             return chain.filter(exchange);
         }
 

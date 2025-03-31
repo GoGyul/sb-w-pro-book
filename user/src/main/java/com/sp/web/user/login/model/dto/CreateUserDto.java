@@ -1,8 +1,7 @@
-package com.sp.web.user.login.model;
+package com.sp.web.user.login.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 
 @Getter

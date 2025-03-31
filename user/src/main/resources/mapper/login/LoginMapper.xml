@@ -4,12 +4,17 @@
 
 <mapper namespace="com.sp.web.user.login.mapper.LoginMapper">
 
-    <select id="getUserById" parameterType="int" resultType="com.sp.web.user.login.model.CreateUserDto">
+    <select id="getUserById" parameterType="int" resultType="com.sp.web.user.login.model.dto.CreateUserDto">
         SELECT * FROM users WHERE id = #{id}
     </select>
 
-    <select id="countByUserId" parameterType="com.sp.web.user.login.model.CreateUserDto">
+    <select id="countByUserId" parameterType="com.sp.web.user.login.model.dto.CreateUserDto">
         SELECT COUNT(*) FROM mv_user WHERE user_id = #{userId}
     </select>
+
+    <insert id="insertUser" parameterType="com.sp.web.user.login.model.entity.UserEntity">
+        INSERT INTO mv_user (user_id, user_password, gender, birth_date)
+        VALUES (#{userId}, #{userPassword}, #{gender}, #{birthDate})
+    </insert>
 
 </mapper>

@@ -1,20 +1,21 @@
 package com.sp.web.user.config;
 
-import com.sp.web.user.login.service.CustomUserDetailsService;
+import com.sp.web.user.jwt.JwtAuthenticationFilter;
+import com.sp.web.user.jwt.JwtUtil;
+import com.sp.web.user.auth.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -22,6 +23,8 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
+    private final JwtUtil jwtUtil;
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -38,10 +41,11 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/public/**").permitAll()  // ✅ 로그인 API는 누구나 접근 가능
+                        .requestMatchers("/auth/**").permitAll()  // ✅ 로그인 API는 누구나 접근 가능
                         .anyRequest().permitAll()              // ✅ 그 외는 인증 필요
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // ✅ JWT 사용 → 세션 사용 X
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil,userDetailsService) , UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

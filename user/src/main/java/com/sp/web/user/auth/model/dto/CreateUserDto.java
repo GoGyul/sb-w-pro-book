@@ -1,4 +1,4 @@
-package com.sp.web.user.login.model.dto;
+package com.sp.web.user.auth.model.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

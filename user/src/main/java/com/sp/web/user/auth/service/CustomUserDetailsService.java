@@ -1,7 +1,7 @@
-package com.sp.web.user.login.service;
+package com.sp.web.user.auth.service;
 
-import com.sp.web.user.login.mapper.LoginMapper;
-import com.sp.web.user.login.model.entity.UserEntity;
+import com.sp.web.user.auth.mapper.LoginMapper;
+import com.sp.web.user.auth.model.entity.UserEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

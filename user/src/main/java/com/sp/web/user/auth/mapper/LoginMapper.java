@@ -1,7 +1,7 @@
-package com.sp.web.user.login.mapper;
+package com.sp.web.user.auth.mapper;
 
-import com.sp.web.user.login.model.dto.CreateUserDto;
-import com.sp.web.user.login.model.entity.UserEntity;
+import com.sp.web.user.auth.model.dto.CreateUserDto;
+import com.sp.web.user.auth.model.entity.UserEntity;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

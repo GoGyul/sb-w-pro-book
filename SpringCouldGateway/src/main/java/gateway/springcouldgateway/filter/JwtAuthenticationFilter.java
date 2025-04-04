@@ -15,9 +15,10 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
 
     private final JwtTokenProvider jwtTokenProvider;
 
-    public JwtAuthenticationFilter() {
+    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
         super(Config.class); // 이 줄도 꼭 있어야 함!
-        this.jwtTokenProvider = new JwtTokenProvider();
+
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     /**

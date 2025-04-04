@@ -14,6 +14,7 @@ public class CreateUserDto {
     @NotBlank
     private String userPassword;
 
+    private String role;
     private String gender;   // "M", "F"
     private String birthDate; // "YYYY-MM-DD"
 

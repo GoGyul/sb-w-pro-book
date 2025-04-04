@@ -40,6 +40,7 @@ public class LoginService {
         userEntity.setUserPassword(encodedPassword);
         userEntity.setGender(dto.getGender());
         userEntity.setBirthDate(dto.getBirthDate());
+        userEntity.setRole("USER");
 
         // DB에 저장
         loginMapper.insertUser(userEntity);

@@ -13,8 +13,8 @@
     </select>
 
     <insert id="insertUser" parameterType="com.sp.web.user.auth.model.entity.UserEntity">
-        INSERT INTO mv_user (user_id, user_password, gender, birth_date)
-        VALUES (#{userId}, #{userPassword}, #{gender}, #{birthDate})
+        INSERT INTO mv_user (user_id, user_password, gender, birth_date , role)
+        VALUES (#{userId}, #{userPassword}, #{gender}, #{birthDate}, #{role})
     </insert>
 
     <select id="selectUserInfo" parameterType="string" resultType="com.sp.web.user.auth.model.entity.UserEntity">
@@ -23,6 +23,7 @@
              , user_password
              , gender
              , birth_date
+             , role
           FROM mv_user WHERE user_id = #{userId}
     </select>
 

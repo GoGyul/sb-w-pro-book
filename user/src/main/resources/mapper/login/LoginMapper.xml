@@ -17,4 +17,13 @@
         VALUES (#{userId}, #{userPassword}, #{gender}, #{birthDate})
     </insert>
 
+    <select id="selectUserInfo" parameterType="string" resultType="com.sp.web.user.login.model.entity.UserEntity">
+        SELECT
+               user_id
+             , user_password
+             , gender
+             , birth_date
+          FROM mv_user WHERE user_id = #{userId}
+    </select>
+
 </mapper>

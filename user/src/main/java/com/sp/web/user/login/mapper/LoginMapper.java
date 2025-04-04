@@ -11,4 +11,6 @@ public interface LoginMapper {
     int countByUserId(CreateUserDto dto);
 
     void insertUser(UserEntity userEntity);
+
+    UserEntity selectUserInfo(String userId);
 }

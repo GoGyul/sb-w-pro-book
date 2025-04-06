@@ -5,8 +5,10 @@ import com.sp.web.user.auth.mapper.LoginMapper;
 import com.sp.web.user.auth.model.dto.CreateUserDto;
 import com.sp.web.user.auth.model.dto.LoginUserDto;
 import com.sp.web.user.auth.model.entity.UserEntity;
+import com.sp.web.user.redis.service.RedisLoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,11 @@ public class LoginService {
     private final LoginMapper loginMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil; // JWT 유틸 추가
+    private final RedisLoginService redisLoginService;
+
+    @Value("${jwt.expiration-time}")
+    private long expirationTime;
+
 
     public boolean createUser(CreateUserDto dto) {
 
@@ -40,7 +47,7 @@ public class LoginService {
         userEntity.setUserPassword(encodedPassword);
         userEntity.setGender(dto.getGender());
         userEntity.setBirthDate(dto.getBirthDate());
-        userEntity.setRole("USER");
+        userEntity.setRole("ROLE_USER");
 
         // DB에 저장
         loginMapper.insertUser(userEntity);
@@ -69,8 +76,12 @@ public class LoginService {
         // 인증된 정보를 SecurityContextHolder에 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        String token = jwtUtil.generateToken(dto.getUserId());
+
+        redisLoginService.saveToken(dto.getUserId(),token,expirationTime);
+
         // JWT 생성 후 반환
-        return jwtUtil.generateToken(dto.getUserId());
+        return token;
 
     }
 }

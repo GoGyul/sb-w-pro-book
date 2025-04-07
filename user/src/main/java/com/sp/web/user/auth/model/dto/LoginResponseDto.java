@@ -12,7 +12,8 @@ import lombok.Setter;
 public class LoginResponseDto {
 
     private boolean success;   // 로그인 성공 여부
-    private String token;      // JWT 토큰
+    private String accessToken;   // ✅ Access Token
+    private String refreshToken;  // ✅ Refresh Token
     private String userId;     // 로그인한 유저 ID
     private String message;    // 메시지 (성공/실패 이유)
 

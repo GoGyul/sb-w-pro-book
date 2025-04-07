@@ -28,11 +28,13 @@ public class LoginController {
 
         log.info("🔑 Login attempt: {}", dto.getUserId());
 
-        String token = loginService.postLogin(dto);
+        // accessToken과 refreshToken 모두 발급
+        var tokenMap = loginService.postLogin(dto);
 
         return new LoginResponseDto(
-                true,       // ✅ 로그인 성공 여부
-                token,      // ✅ JWT 토큰
+                true,
+                tokenMap.get("accessToken"),
+                tokenMap.get("refreshToken"),
                 dto.getUserId(),
                 "로그인 성공"
         );

@@ -1,6 +1,7 @@
 package gateway.springcouldgateway.filter;
 
 import gateway.springcouldgateway.jwt.JwtTokenProvider;
+import gateway.springcouldgateway.redis.RedisLoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -14,11 +15,15 @@ import org.springframework.stereotype.Component;
 public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAuthenticationFilter.Config> {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisLoginService redisLoginService;
 
-    public JwtAuthenticationFilter(JwtTokenProvider jwtTokenProvider) {
+    public JwtAuthenticationFilter(
+            JwtTokenProvider jwtTokenProvider
+          , RedisLoginService redisLoginService) {
+
         super(Config.class); // 이 줄도 꼭 있어야 함!
-
         this.jwtTokenProvider = jwtTokenProvider;
+        this.redisLoginService = redisLoginService;
     }
 
     /**
@@ -29,7 +34,9 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             String token = extractToken(exchange.getRequest());
-            if(token != null && jwtTokenProvider.validateToken(token)) {
+            if(token != null
+                    && jwtTokenProvider.validateToken(token)
+                    && redisLoginService.isRefreshTokenValid(token)) {
                 return chain.filter(exchange);
             }
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);

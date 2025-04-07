@@ -16,6 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -64,7 +67,7 @@ public class LoginService {
 6️⃣ 인증이 성공하면 Authentication 객체가 반환됨
 7️⃣ SecurityContextHolder에 인증 정보를 저장
     */
-    public String postLogin(LoginUserDto dto) {
+    public Map<String, String> postLogin(LoginUserDto dto) {
 
         log.info("================== login start ==================");
 
@@ -76,12 +79,19 @@ public class LoginService {
         // 인증된 정보를 SecurityContextHolder에 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = jwtUtil.generateToken(dto.getUserId());
+        // Access + Refresh Token 발급
+        String accessToken = jwtUtil.generateAccessToken(dto.getUserId());
+        String refreshToken = jwtUtil.generateRefreshToken(dto.getUserId());
 
-        redisLoginService.saveToken(dto.getUserId(),token,expirationTime);
+        redisLoginService.saveRefreshToken(dto.getUserId(), refreshToken);
+
+        // 클라이언트에 둘 다 전달
+        Map<String, String> tokenMap = new HashMap<>();
+        tokenMap.put("accessToken", accessToken);
+        tokenMap.put("refreshToken", refreshToken);
 
         // JWT 생성 후 반환
-        return token;
+        return tokenMap;
 
     }
 }

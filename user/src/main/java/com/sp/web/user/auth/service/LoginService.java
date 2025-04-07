@@ -1,11 +1,13 @@
 package com.sp.web.user.auth.service;
 
+import com.sp.web.user.auth.model.dto.LogoutResponseDto;
 import com.sp.web.user.jwt.JwtUtil;
 import com.sp.web.user.auth.mapper.LoginMapper;
 import com.sp.web.user.auth.model.dto.CreateUserDto;
 import com.sp.web.user.auth.model.dto.LoginUserDto;
 import com.sp.web.user.auth.model.entity.UserEntity;
 import com.sp.web.user.redis.service.RedisLoginService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,5 +95,19 @@ public class LoginService {
         // JWT 생성 후 반환
         return tokenMap;
 
+    }
+
+    public LogoutResponseDto postLogout(HttpServletRequest request) {
+
+        String token = jwtUtil.resolveToken(request);
+
+        if(token != null && jwtUtil.validateToken(token) ) {
+            String userId = jwtUtil.getUserIdFromToken(token);
+
+            redisLoginService.deleteToken(token);
+            redisLoginService.deleteRefreshToken(token);
+            return new LogoutResponseDto(true, "로그아웃 성공", userId);
+        }
+        return new LogoutResponseDto(false, "유효하지 않은 토큰", null);
     }
 }

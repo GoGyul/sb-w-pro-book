@@ -44,6 +44,10 @@ public class RedisLoginService {
         redisTemplate.delete(LOGIN_PREFIX + token);
     }
 
+    public void deleteRefreshToken(String token) {
+        redisTemplate.delete(REFRESH_PREFIX + token);
+    }
+
     public boolean isTokenValid(String token) {
         return redisTemplate.hasKey(LOGIN_PREFIX + token);
     }

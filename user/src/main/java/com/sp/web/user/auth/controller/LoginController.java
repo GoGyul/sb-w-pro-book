@@ -3,7 +3,10 @@ package com.sp.web.user.auth.controller;
 import com.sp.web.user.auth.model.dto.CreateUserDto;
 import com.sp.web.user.auth.model.dto.LoginResponseDto;
 import com.sp.web.user.auth.model.dto.LoginUserDto;
+import com.sp.web.user.auth.model.dto.LogoutResponseDto;
 import com.sp.web.user.auth.service.LoginService;
+import com.sp.web.user.jwt.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
     private final LoginService loginService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/public/create")
     private boolean createUser (@RequestBody CreateUserDto dto){
@@ -38,6 +42,13 @@ public class LoginController {
                 dto.getUserId(),
                 "로그인 성공"
         );
+
+    }
+
+    @PostMapping("/public/logout")
+    private LogoutResponseDto logout(HttpServletRequest request){
+
+        return loginService.postLogout(request);
 
     }
 

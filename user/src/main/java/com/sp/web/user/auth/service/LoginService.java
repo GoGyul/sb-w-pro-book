@@ -104,7 +104,7 @@ public class LoginService {
         if(token != null && jwtUtil.validateToken(token) ) {
             String userId = jwtUtil.getUserIdFromToken(token);
 
-            redisLoginService.deleteToken(token);
+//            redisLoginService.deleteToken(token);
             redisLoginService.deleteRefreshToken(token);
             return new LogoutResponseDto(true, "로그아웃 성공", userId);
         }

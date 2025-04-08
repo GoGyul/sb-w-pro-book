@@ -1,6 +1,8 @@
 package com.sp.web.user.redis.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sp.web.user.redis.dto.TokenInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,7 +16,8 @@ import java.time.Duration;
 @Slf4j
 public class RedisLoginService {
 
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, TokenInfo> redisTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String LOGIN_PREFIX = "LOGIN:";
     private static final String REFRESH_PREFIX = "REFRESH:";
@@ -22,22 +25,27 @@ public class RedisLoginService {
     @Value("${jwt.refresh-expiration-time}")
     private long refreshExpirationTime;
 
-    public void saveToken(String userId, String token , long expirationMillis) {
-        String key = LOGIN_PREFIX + token;
-        redisTemplate.opsForValue().set(key, userId, Duration.ofMillis(expirationMillis));
-        log.info("📦 Redis 저장: key={}, userId={}", key, userId);
-    }
+//    public void saveToken(String userId, String token , long expirationMillis) {
+//        String key = LOGIN_PREFIX + token;
+//        redisTemplate.opsForValue().set(key, userId, Duration.ofMillis(expirationMillis));
+//        log.info("📦 Redis 저장: key={}, userId={}", key, userId);
+//    }
 
     public void saveRefreshToken(String userId, String refreshToken) {
         String key = REFRESH_PREFIX + refreshToken;
+        TokenInfo tokenInfo = new TokenInfo(userId, refreshToken);
         redisTemplate.opsForValue()
-                .set(key, userId, Duration.ofMillis(refreshExpirationTime));
-        log.info("📦 Redis 저장: key={}, userId={}", key, userId);
+                .set(key, tokenInfo, Duration.ofMillis(refreshExpirationTime));
+        log.info("📦 Redis 저장: key={}, tokenInfo={}", key, tokenInfo);
     }
 
     public boolean isRefreshTokenValid(String userId, String token) {
-        String saved = redisTemplate.opsForValue().get(REFRESH_PREFIX + token);
-        return saved != null && saved.equals(token);
+        String key = REFRESH_PREFIX + token;
+        TokenInfo saved = redisTemplate.opsForValue().get(key);  // TokenInfo로 받아야 함!
+
+        return saved != null &&
+                saved.getUserId().equals(userId) &&
+                saved.getRefreshToken().equals(token);  // 실제 토큰 값 비교
     }
 
     public void deleteToken(String token) {

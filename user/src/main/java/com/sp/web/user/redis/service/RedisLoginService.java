@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sp.web.user.redis.dto.TokenInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.time.Duration;
 @Slf4j
 public class RedisLoginService {
 
+    @Qualifier("tokenInfoRedisTemplate")
     private final RedisTemplate<String, TokenInfo> redisTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -34,6 +36,7 @@ public class RedisLoginService {
     public void saveRefreshToken(String userId, String refreshToken) {
         String key = REFRESH_PREFIX + refreshToken;
         TokenInfo tokenInfo = new TokenInfo(userId, refreshToken);
+        log.info("🔐 저장 전 TokenInfo = {}", tokenInfo.getClass().getName());
         redisTemplate.opsForValue()
                 .set(key, tokenInfo, Duration.ofMillis(refreshExpirationTime));
         log.info("📦 Redis 저장: key={}, tokenInfo={}", key, tokenInfo);
@@ -60,4 +63,10 @@ public class RedisLoginService {
         return redisTemplate.hasKey(LOGIN_PREFIX + token);
     }
 
+    public TokenInfo getTokenInfo(String refreshToken) {
+        String key = REFRESH_PREFIX + refreshToken;
+        TokenInfo tokenInfo = redisTemplate.opsForValue().get(key);
+        log.info("🔍 Redis 조회: key={}, tokenInfo={}", key, tokenInfo);
+        return tokenInfo;
+    }
 }

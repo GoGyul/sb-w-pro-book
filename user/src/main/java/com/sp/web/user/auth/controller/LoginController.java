@@ -1,14 +1,14 @@
 package com.sp.web.user.auth.controller;
 
-import com.sp.web.user.auth.model.dto.CreateUserDto;
-import com.sp.web.user.auth.model.dto.LoginResponseDto;
-import com.sp.web.user.auth.model.dto.LoginUserDto;
-import com.sp.web.user.auth.model.dto.LogoutResponseDto;
+import com.sp.web.user.auth.model.dto.*;
 import com.sp.web.user.auth.service.LoginService;
 import com.sp.web.user.jwt.JwtUtil;
+import com.sp.web.user.redis.dto.TokenInfo;
+import com.sp.web.user.redis.service.RedisLoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.el.parser.Token;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class LoginController {
 
     private final LoginService loginService;
+    private final RedisLoginService redisLoginService;
     private final JwtUtil jwtUtil;
 
     @PostMapping("/public/create")
@@ -49,6 +50,13 @@ public class LoginController {
     private LogoutResponseDto logout(HttpServletRequest request){
 
         return loginService.postLogout(request);
+
+    }
+
+    @PostMapping("/public/reissue")
+    private ReissueResponseDto reissue (@RequestHeader("Authorization") String refreshTokenHeader){
+
+        return loginService.postReissue(refreshTokenHeader);
 
     }
 

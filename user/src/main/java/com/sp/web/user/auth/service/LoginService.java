@@ -1,11 +1,13 @@
 package com.sp.web.user.auth.service;
 
 import com.sp.web.user.auth.model.dto.LogoutResponseDto;
+import com.sp.web.user.auth.model.dto.ReissueResponseDto;
 import com.sp.web.user.jwt.JwtUtil;
 import com.sp.web.user.auth.mapper.LoginMapper;
 import com.sp.web.user.auth.model.dto.CreateUserDto;
 import com.sp.web.user.auth.model.dto.LoginUserDto;
 import com.sp.web.user.auth.model.entity.UserEntity;
+import com.sp.web.user.redis.dto.TokenInfo;
 import com.sp.web.user.redis.service.RedisLoginService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -109,5 +111,25 @@ public class LoginService {
             return new LogoutResponseDto(true, "로그아웃 성공", userId);
         }
         return new LogoutResponseDto(false, "유효하지 않은 토큰", null);
+    }
+
+    public ReissueResponseDto postReissue(String refreshTokenHeader) {
+
+        String refreshToken = jwtUtil.resolveToken(refreshTokenHeader);
+
+        if(refreshTokenHeader == null || !jwtUtil.validateToken(refreshToken)) {
+            return new ReissueResponseDto(false,  null,null,null, "유효하지 않은 리프레시 토큰");
+        }
+
+        String userId = jwtUtil.getUserIdFromToken(refreshToken);
+
+        TokenInfo tokenInfo = redisLoginService.getTokenInfo(refreshToken);
+        if(tokenInfo == null || !tokenInfo.getUserId().equals(userId)) {
+            return new ReissueResponseDto(false, null, null,null, "토큰이 일치하지 않거나 만료됨");
+        }
+        String newAccessToken = jwtUtil.generateAccessToken(userId);
+
+        return new ReissueResponseDto(true, newAccessToken, null, userId, "AccessToken 재발급 완료");
+
     }
 }

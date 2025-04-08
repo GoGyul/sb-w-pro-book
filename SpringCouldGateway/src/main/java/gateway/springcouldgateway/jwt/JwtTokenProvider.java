@@ -3,9 +3,11 @@ package gateway.springcouldgateway.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import gateway.springcouldgateway.config.JwtConfig;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -13,6 +15,7 @@ import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtTokenProvider {
 
     private final JwtConfig jwtConfig;
@@ -33,9 +36,12 @@ public class JwtTokenProvider {
         try{
             JWT.require(Algorithm.HMAC256(jwtConfig.getSecret())).build().verify(token);
             return true;
-        }catch (JWTVerificationException e){
-            return false;
+        }catch (TokenExpiredException e) {
+            log.warn("Token expired", e);
+        } catch (JWTVerificationException e) {
+            log.warn("Invalid token", e);
         }
+        return false;
     }
 
     public String getUserId(String token) {

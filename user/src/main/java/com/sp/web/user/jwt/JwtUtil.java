@@ -60,6 +60,14 @@ public class JwtUtil {
         return null;
     }
 
+    // Authorization 헤더 문자열을 직접 파싱할 수 있게 오버로드
+    public String resolveToken(String bearerHeader) {
+        if (bearerHeader != null && bearerHeader.startsWith("Bearer ")) {
+            return bearerHeader.substring(7);
+        }
+        return null;
+    }
+
     public String getUserIdFromToken(String token) {
         DecodedJWT jwt = JWT.require(Algorithm.HMAC256(secretKey))
                 .build()

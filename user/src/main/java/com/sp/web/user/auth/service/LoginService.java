@@ -10,9 +10,11 @@ import com.sp.web.user.auth.model.entity.UserEntity;
 import com.sp.web.user.redis.dto.TokenInfo;
 import com.sp.web.user.redis.service.RedisLoginService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -71,7 +73,7 @@ public class LoginService {
 6️⃣ 인증이 성공하면 Authentication 객체가 반환됨
 7️⃣ SecurityContextHolder에 인증 정보를 저장
     */
-    public Map<String, String> postLogin(LoginUserDto dto) {
+    public Map<String, String> postLogin(LoginUserDto dto, HttpServletResponse response) {
 
         log.info("================== login start ==================");
 
@@ -93,6 +95,17 @@ public class LoginService {
         Map<String, String> tokenMap = new HashMap<>();
         tokenMap.put("accessToken", accessToken);
         tokenMap.put("refreshToken", refreshToken);
+
+        // 🔐 refreshToken을 HttpOnly 쿠키로 설정
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", tokenMap.get("refreshToken"))
+                .httpOnly(true)
+                .secure(false) // 개발용: true면 HTTPS 필요
+                .path("/")     // 쿠키 경로
+                .maxAge(7 * 24 * 60 * 60) // 7일
+                .sameSite("Lax") // 필요에 따라 변경 가능 (Cross 요청이면 "None")
+                .build();
+
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
         // JWT 생성 후 반환
         return tokenMap;

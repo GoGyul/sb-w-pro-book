@@ -6,9 +6,11 @@ import com.sp.web.user.jwt.JwtUtil;
 import com.sp.web.user.redis.dto.TokenInfo;
 import com.sp.web.user.redis.service.RedisLoginService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.el.parser.Token;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,12 +31,12 @@ public class LoginController {
     }
 
     @PostMapping("/public/login")
-    private LoginResponseDto login (@RequestBody LoginUserDto dto){
+    private LoginResponseDto login (@RequestBody LoginUserDto dto , HttpServletResponse response){
 
         log.info("🔑 Login attempt: {}", dto.getUserId());
 
         // accessToken과 refreshToken 모두 발급
-        var tokenMap = loginService.postLogin(dto);
+        var tokenMap = loginService.postLogin(dto , response);
 
         return new LoginResponseDto(
                 true,

@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { ref, defineEmits } from "vue";
-import { login } from "@/api/auth/loginApi"; // 로그인 API 함수 import
+import { useLoginMutation } from "@/api/auth/use/useLoginMutation";
+import { useAuthStore } from "@/stores/useAuthStore";
 import type { LoginUserDto, LoginResponseDto } from "@/types/auth/loginDto";
 
 const emit = defineEmits(["close"]);
+const authStore = useAuthStore();
 
 const userId = ref("");
 const userPassword = ref("");
 
-const doLogin = async () => {
+const { mutate: loginMutate, isPending, isError, error } = useLoginMutation();
+
+const doLogin = () => {
   console.log("ID:", userId.value);
   console.log("Password:", userPassword.value);
 
@@ -17,19 +21,17 @@ const doLogin = async () => {
     userPassword: userPassword.value,
   };
 
-  try {
-    const response = await login(loginData);
-    console.log("✅ 로그인 성공:", response);
-
-    // 토큰 저장 예시 (원하면 여기서 localStorage 등에 저장 가능)
-    localStorage.setItem("accessToken", response.accessToken);
-    localStorage.setItem("refreshToken", response.refreshToken);
-
-    emit("close"); // 로그인 성공 후 모달 닫기
-  } catch (error) {
-    console.error("❌ 로그인 실패", error);
-    alert("로그인에 실패했습니다. 아이디/비밀번호를 확인해주세요.");
-  }
+  // useMutation의 mutate 함수 호출
+  loginMutate(loginData, {
+    onSuccess: (res) => {
+      authStore.loginSuccess(res.accessToken, res.userId); // ✅ 유저 상태 저장
+      emit("close");
+    },
+    onError: (error) => {
+      console.error("❌ 로그인 실패", error);
+      alert("로그인에 실패했습니다. 아이디/비밀번호를 확인해주세요.");
+    },
+  });
 };
 
 const emitClose = () => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import LoginModal from "@/components/common/LoginModal.vue";
+import LoginModal from "@/components/auth/LoginModal.vue";
 
 const showLogin = ref(false);
 </script>

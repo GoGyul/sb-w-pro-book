@@ -1,0 +1,120 @@
+<script setup lang="ts">
+import { ref, defineEmits } from "vue";
+import { login } from "@/api/auth/loginApi"; // 로그인 API 함수 import
+import type { LoginUserDto, LoginResponseDto } from "@/types/auth/loginDto";
+
+const emit = defineEmits(["close"]);
+
+const userId = ref("");
+const userPassword = ref("");
+
+const doLogin = async () => {
+  console.log("ID:", userId.value);
+  console.log("Password:", userPassword.value);
+
+  const loginData: LoginUserDto = {
+    userId: userId.value,
+    userPassword: userPassword.value,
+  };
+
+  try {
+    const response = await login(loginData);
+    console.log("✅ 로그인 성공:", response);
+
+    // 토큰 저장 예시 (원하면 여기서 localStorage 등에 저장 가능)
+    localStorage.setItem("accessToken", response.accessToken);
+    localStorage.setItem("refreshToken", response.refreshToken);
+
+    emit("close"); // 로그인 성공 후 모달 닫기
+  } catch (error) {
+    console.error("❌ 로그인 실패", error);
+    alert("로그인에 실패했습니다. 아이디/비밀번호를 확인해주세요.");
+  }
+};
+
+const emitClose = () => {
+  emit("close");
+};
+</script>
+
+<template>
+  <div class="modal-backdrop" @click.self="emitClose">
+    <div class="modal">
+      <h2>로그인</h2>
+      <form @submit.prevent="doLogin">
+        <input type="text" v-model="userId" placeholder="ID" />
+        <input type="password" v-model="userPassword" placeholder="비밀번호" />
+        <div class="button-group">
+          <button type="submit">로그인</button>
+          <button type="button" class="cancel-btn" @click="emitClose">
+            닫기
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  min-width: 300px;
+}
+
+input {
+  display: block;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+button {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+}
+
+button[type="submit"] {
+  background-color: #42b983;
+  color: white;
+}
+
+button[type="submit"]:hover {
+  background-color: #369870;
+}
+
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #c0c0c0;
+}
+</style>

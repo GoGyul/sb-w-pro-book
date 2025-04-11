@@ -1,6 +1,6 @@
 // src/composables/auth/useLoginMutation.ts
 import { useMutation } from "@tanstack/vue-query";
-import { loginApi } from "@/api/auth/loginApi";
+import { loginApi } from "@/api/auth/login/loginApi";
 import { LoginUserDto } from "@/types/auth/loginDto";
 
 export function useLoginMutation() {

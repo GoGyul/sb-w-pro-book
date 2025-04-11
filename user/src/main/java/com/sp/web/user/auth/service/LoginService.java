@@ -1,11 +1,8 @@
 package com.sp.web.user.auth.service;
 
-import com.sp.web.user.auth.model.dto.LogoutResponseDto;
-import com.sp.web.user.auth.model.dto.ReissueResponseDto;
+import com.sp.web.user.auth.model.dto.*;
 import com.sp.web.user.jwt.JwtUtil;
 import com.sp.web.user.auth.mapper.LoginMapper;
-import com.sp.web.user.auth.model.dto.CreateUserDto;
-import com.sp.web.user.auth.model.dto.LoginUserDto;
 import com.sp.web.user.auth.model.entity.UserEntity;
 import com.sp.web.user.redis.dto.TokenInfo;
 import com.sp.web.user.redis.service.RedisLoginService;
@@ -21,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,8 +37,8 @@ public class LoginService {
     @Value("${jwt.expiration-time}")
     private long expirationTime;
 
-
-    public boolean createUser(CreateUserDto dto) {
+    @Transactional
+    public CreateUserResponseDto createUser(CreateUserDto dto) {
 
         //아이디 중복 확인
         if (loginMapper.countByUserId(dto) > 0) {
@@ -59,9 +57,13 @@ public class LoginService {
         userEntity.setRole("ROLE_USER");
 
         // DB에 저장
-        loginMapper.insertUser(userEntity);
+        boolean isCreated = loginMapper.insertUser(userEntity);
 
-        return true;
+        if (isCreated) {
+            return new CreateUserResponseDto(true, dto.getUserId(), "회원가입 성공");
+        } else {
+            return new CreateUserResponseDto(false, null, "회원가입 실패: 이미 존재하는 사용자");
+        }
     }
 
     /*
@@ -73,6 +75,7 @@ public class LoginService {
 6️⃣ 인증이 성공하면 Authentication 객체가 반환됨
 7️⃣ SecurityContextHolder에 인증 정보를 저장
     */
+    @Transactional
     public Map<String, String> postLogin(LoginUserDto dto, HttpServletResponse response) {
 
         log.info("================== login start ==================");
@@ -112,6 +115,7 @@ public class LoginService {
 
     }
 
+    @Transactional
     public LogoutResponseDto postLogout(HttpServletRequest request) {
 
         String token = jwtUtil.resolveToken(request);
@@ -126,6 +130,7 @@ public class LoginService {
         return new LogoutResponseDto(false, "유효하지 않은 토큰", null);
     }
 
+    @Transactional
     public ReissueResponseDto postReissue(String refreshTokenHeader) {
 
         String refreshToken = jwtUtil.resolveToken(refreshTokenHeader);

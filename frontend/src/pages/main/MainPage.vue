@@ -12,7 +12,7 @@ const authStore = useAuthStore(); // ✅ store 인스턴스 사용
     <HeaderComponent />
 
     <main class="content">
-      <h1>메인 페이지입니다</h1>
+      <h1></h1>
       <h1>
         {{ authStore }}
       </h1>

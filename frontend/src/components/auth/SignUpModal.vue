@@ -1,37 +1,42 @@
 <script setup lang="ts">
 import { ref, defineEmits, reactive } from "vue";
-import { useLoginMutation } from "@/api/auth/login/use/useLoginMutation";
-import { useAuthStore } from "@/stores/useAuthStore";
-import type { LoginUserDto, LoginResponseDto } from "@/types/auth/loginDto";
+import type { CreateUserDto } from "@/types/auth/userDto";
+import { useSignUpMutation } from "@/api/auth/signup/use/useSignUpMutation";
 
 const emit = defineEmits(["close"]);
-const authStore = useAuthStore();
 
 const insertForm = reactive({
   userId: "",
   userPassword: "",
+  gender: "",
+  birthDate: "",
 });
 
-const { mutate: loginMutate, isPending, isError, error } = useLoginMutation();
+const { mutate: signUpMutate, isPending, isError, error } = useSignUpMutation();
 
-const doLogin = () => {
-  console.log("ID:", insertForm.userId);
-  console.log("Password:", insertForm.userPassword);
-
-  const loginData: LoginUserDto = {
+// 회원가입 버튼 클릭 시 처리
+const doSignup = () => {
+  // if (!insertForm.userId || !insertForm.userPassword) {
+  //   alert("아이디와 비밀번호는 필수입니다.");
+  //   return;
+  // }
+  debugger;
+  const signUpData: CreateUserDto = {
     userId: insertForm.userId,
     userPassword: insertForm.userPassword,
+    gender: insertForm.gender === "" ? null : insertForm.gender,
+    birthDate: insertForm.birthDate === "" ? null : insertForm.birthDate,
   };
 
-  // useMutation의 mutate 함수 호출
-  loginMutate(loginData, {
+  signUpMutate(signUpData, {
     onSuccess: (res) => {
-      authStore.loginSuccess(res.accessToken, res.userId); // ✅ 유저 상태 저장
+      alert("회원가입 성공");
+      console.error("❌ 회원가입 성공", res);
       emit("close");
     },
     onError: (error) => {
-      console.error("❌ 로그인 실패", error);
-      alert("로그인에 실패했습니다. 아이디/비밀번호를 확인해주세요.");
+      console.error("❌ 회원가입 실패", error);
+      alert("회원가입에 실패했습니다.");
     },
   });
 };
@@ -44,16 +49,36 @@ const emitClose = () => {
 <template>
   <div class="modal-backdrop" @click.self="emitClose">
     <div class="modal">
-      <h2>로그인</h2>
-      <form @submit.prevent="doLogin">
-        <input type="text" v-model="insertForm.userId" placeholder="ID" />
+      <h2>회원가입</h2>
+      <form @submit.prevent="doSignup">
+        <input
+          type="text"
+          v-model="insertForm.userId"
+          placeholder="ID (필수)"
+          required
+          maxlength="10"
+        />
         <input
           type="password"
           v-model="insertForm.userPassword"
-          placeholder="비밀번호"
+          placeholder="비밀번호 (필수)"
+          required
+          maxlength="10"
         />
+        <select v-model="insertForm.gender">
+          <option disabled value="">성별 선택 (선택)</option>
+          <option value="M">남자</option>
+          <option value="F">여자</option>
+          <option value="">없음</option>
+        </select>
+        <input
+          type="date"
+          v-model="insertForm.birthDate"
+          placeholder="생년월일 (선택)"
+        />
+
         <div class="button-group">
-          <button type="submit">로그인</button>
+          <button type="submit">가입하기</button>
           <button type="button" class="cancel-btn" @click="emitClose">
             닫기
           </button>
@@ -85,7 +110,8 @@ const emitClose = () => {
   min-width: 300px;
 }
 
-input {
+input,
+select {
   display: block;
   margin-bottom: 1rem;
   padding: 0.5rem;

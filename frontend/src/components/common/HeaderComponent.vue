@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import LoginModal from "@/components/auth/LoginModal.vue";
+import SignUpModal from "@/components/auth/SignUpModal.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 
 const showLogin = ref(false);
+const showSignup = ref(false);
 const authStore = useAuthStore(); // ✅ store 인스턴스 사용
 </script>
 
@@ -13,10 +15,11 @@ const authStore = useAuthStore(); // ✅ store 인스턴스 사용
       <span style="margin-right: 10px">👤 </span>
       <button class="login-btn" @click="showLogin = true">로그인</button>
       <button class="logout-btn" @click="handleLogout">로그아웃</button>
-      <button class="signup-btn">회원가입</button>
+      <button class="signup-btn" @click="showSignup = true">회원가입</button>
     </div>
 
     <LoginModal v-if="showLogin" @close="showLogin = false" />
+    <SignUpModal v-if="showSignup" @close="showSignup = false" />
   </header>
 </template>
 

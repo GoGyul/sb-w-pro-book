@@ -24,7 +24,7 @@ public class LoginController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/public/create")
-    private boolean createUser (@RequestBody CreateUserDto dto){
+    private CreateUserResponseDto createUser (@RequestBody CreateUserDto dto){
 
         return loginService.createUser(dto);
 

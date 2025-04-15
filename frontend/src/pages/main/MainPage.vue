@@ -9,7 +9,7 @@ const showLogin = ref(false);
 const authStore = useAuthStore(); // ✅ store 인스턴스 사용
 
 const goToSecretPage = () => {
-  router.push("/secret"); // 이동할 라우터 경로
+  router.push("/board"); // 이동할 라우터 경로
 };
 </script>
 

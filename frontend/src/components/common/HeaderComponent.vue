@@ -29,9 +29,7 @@ const doLogout = async () => {
   <header class="header">
     <div class="header-inner">
       <span style="margin-right: 10px">👤 </span>
-      <span v-if="authStore.isLoggedIn"
-        >안녕하세요, {{ authStore.nickname }} 님!</span
-      >
+      <span v-if="authStore.isLoggedIn">반갑다 {{ authStore.nickname }} </span>
       <span v-else>로그인 해주세요.</span>
       <button
         v-if="!authStore.isLoggedIn"
@@ -43,7 +41,13 @@ const doLogout = async () => {
       <button v-if="authStore.isLoggedIn" class="logout-btn" @click="doLogout">
         로그아웃
       </button>
-      <button class="signup-btn" @click="showSignup = true">회원가입</button>
+      <button
+        class="signup-btn"
+        v-if="!authStore.isLoggedIn"
+        @click="showSignup = true"
+      >
+        회원가입
+      </button>
     </div>
 
     <LoginModal v-if="showLogin" @close="showLogin = false" />

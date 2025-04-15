@@ -49,9 +49,9 @@ public class LoginController {
     }
 
     @PostMapping("/public/logout")
-    private LogoutResponseDto logout(HttpServletRequest request){
+    private LogoutResponseDto logout(HttpServletRequest request, HttpServletResponse response){
 
-        return loginService.postLogout(request);
+        return loginService.postLogout(request,response);
 
     }
 

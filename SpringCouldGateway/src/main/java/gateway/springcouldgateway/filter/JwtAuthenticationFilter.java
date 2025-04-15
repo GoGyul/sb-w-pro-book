@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends AbstractGatewayFilterFactory<JwtAut
             String token = extractToken(exchange.getRequest());
             if(token != null
                     && jwtTokenProvider.validateToken(token)
-//                    && redisLoginService.isRefreshTokenValid(token)
+                    && redisLoginService.isBlacklisted(token)
             ) {
                 return chain.filter(exchange);
             }

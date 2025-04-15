@@ -23,6 +23,8 @@ public class RedisLoginService {
 
     private static final String LOGIN_PREFIX = "LOGIN:";
     private static final String REFRESH_PREFIX = "REFRESH:";
+    private static final String BLACKLIST_PREFIX = "BLACKLIST:";
+
 
     @Value("${jwt.refresh-expiration-time}")
     private long refreshExpirationTime;
@@ -69,4 +71,16 @@ public class RedisLoginService {
         log.info("🔍 Redis 조회: key={}, tokenInfo={}", key, tokenInfo);
         return tokenInfo;
     }
+
+    public void addToBlacklist(String token, long expriationMillis) {
+        String key = BLACKLIST_PREFIX + token;
+        redisTemplate.opsForValue().set(key, new TokenInfo(null,token), Duration.ofMillis(expriationMillis));
+        log.info("🛑 블랙리스트 등록: {}", key);
+    }
+
+    public boolean isBlacklisted(String token) {
+        String key = BLACKLIST_PREFIX + token;
+        return redisTemplate.hasKey(key);
+    }
+
 }

@@ -75,5 +75,15 @@ public class JwtUtil {
         return jwt.getSubject();
     }
 
+    public long getExpiration(String token) {
+        Date expireAt = JWT.require(Algorithm.HMAC256(secretKey))
+                .build()
+                .verify(token)
+                .getExpiresAt();
+        return expireAt.getTime() - System.currentTimeMillis();
+    }
+
+
+
 
 }

@@ -116,18 +116,32 @@ public class LoginService {
     }
 
     @Transactional
-    public LogoutResponseDto postLogout(HttpServletRequest request) {
+    public LogoutResponseDto postLogout(HttpServletRequest request,HttpServletResponse response) {
 
         String token = jwtUtil.resolveToken(request);
 
-        if(token != null && jwtUtil.validateToken(token) ) {
-            String userId = jwtUtil.getUserIdFromToken(token);
-
-//            redisLoginService.deleteToken(token);
-            redisLoginService.deleteRefreshToken(token);
-            return new LogoutResponseDto(true, "로그아웃 성공", userId);
+        if(token == null || !jwtUtil.validateToken(token) ) {
+//            return new LogoutResponseDto(false, "유효하지 않은 토큰", null);
+            throw new IllegalArgumentException("토큰이 유효하지않음.");
         }
-        return new LogoutResponseDto(false, "유효하지 않은 토큰", null);
+
+        String userId = jwtUtil.getUserIdFromToken(token);
+        redisLoginService.deleteRefreshToken(token);
+
+        long expiration = jwtUtil.getExpiration(token);
+        redisLoginService.addToBlacklist(token,expiration);
+
+        ResponseCookie expiredCookie = ResponseCookie.from("refreshToken","")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", expiredCookie.toString());
+
+        return new LogoutResponseDto(true, "로그아웃 성공", userId);
+
     }
 
     @Transactional

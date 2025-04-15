@@ -29,13 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
         }
 
-        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(userEntity.getRole()));
-
-        return new org.springframework.security.core.userdetails.User(
-                userEntity.getUserId(),
-                userEntity.getUserPassword(), // 저장된 암호화된 비밀번호
-                authorities // 권한 정보 (Roles) 추가 가능
-        );
+        // UserEntity를 UserDetails로 반환
+        return userEntity;  // UserEntity는 UserDetails를 구현하므로 직접 반환
     }
 }

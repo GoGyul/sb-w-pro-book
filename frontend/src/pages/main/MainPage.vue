@@ -15,6 +15,7 @@ const authStore = useAuthStore(); // ✅ store 인스턴스 사용
       <h1></h1>
       <h1>
         {{ authStore }}
+        {{ authStore.nickname }}
       </h1>
       <!-- 로그인 상태에 따른 출력 -->
     </main>

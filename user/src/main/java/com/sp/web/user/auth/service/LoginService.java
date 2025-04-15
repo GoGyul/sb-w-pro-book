@@ -52,6 +52,7 @@ public class LoginService {
         UserEntity userEntity = new UserEntity();
         userEntity.setUserId(dto.getUserId());
         userEntity.setUserPassword(encodedPassword);
+        userEntity.setNickname(dto.getNickname());
         userEntity.setGender(dto.getGender());
         userEntity.setBirthDate(dto.getBirthDate());
         userEntity.setRole("ROLE_USER");
@@ -76,7 +77,7 @@ public class LoginService {
 7️⃣ SecurityContextHolder에 인증 정보를 저장
     */
     @Transactional
-    public Map<String, String> postLogin(LoginUserDto dto, HttpServletResponse response) {
+    public LoginResponseDto postLogin(LoginUserDto dto, HttpServletResponse response) {
 
         log.info("================== login start ==================");
 
@@ -84,6 +85,8 @@ public class LoginService {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getUserId(), dto.getUserPassword()) // 🔥 입력한 원래 비밀번호 사용
         );
+
+        UserEntity userEntity = (UserEntity) authentication.getPrincipal();
 
         // 인증된 정보를 SecurityContextHolder에 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -94,13 +97,8 @@ public class LoginService {
 
         redisLoginService.saveRefreshToken(dto.getUserId(), refreshToken);
 
-        // 클라이언트에 둘 다 전달
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("accessToken", accessToken);
-        tokenMap.put("refreshToken", refreshToken);
-
         // 🔐 refreshToken을 HttpOnly 쿠키로 설정
-        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", tokenMap.get("refreshToken"))
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(true)
                 .secure(false) // 개발용: true면 HTTPS 필요
                 .path("/")     // 쿠키 경로
@@ -111,7 +109,7 @@ public class LoginService {
         response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
         // JWT 생성 후 반환
-        return tokenMap;
+        return new LoginResponseDto(true, accessToken, refreshToken, "로그인 성공", userEntity);
 
     }
 

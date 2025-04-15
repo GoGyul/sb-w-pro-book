@@ -26,7 +26,11 @@ const doLogin = () => {
   // useMutation의 mutate 함수 호출
   loginMutate(loginData, {
     onSuccess: (res) => {
-      authStore.loginSuccess(res.accessToken, res.userId); // ✅ 유저 상태 저장
+      authStore.loginSuccess(
+        res.accessToken,
+        res.user.userId,
+        res.user.nickname
+      ); // ✅ 유저 상태 저장..
       emit("close");
     },
     onError: (error) => {

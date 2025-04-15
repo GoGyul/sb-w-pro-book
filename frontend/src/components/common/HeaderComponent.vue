@@ -29,6 +29,10 @@ const doLogout = async () => {
   <header class="header">
     <div class="header-inner">
       <span style="margin-right: 10px">👤 </span>
+      <span v-if="authStore.isLoggedIn"
+        >안녕하세요, {{ authStore.nickname }} 님!</span
+      >
+      <span v-else>로그인 해주세요.</span>
       <button
         v-if="!authStore.isLoggedIn"
         class="login-btn"
@@ -84,6 +88,7 @@ const doLogout = async () => {
 
 .login-btn {
   background-color: #4caf50;
+  margin-left: 10px;
 }
 
 .logout-btn {

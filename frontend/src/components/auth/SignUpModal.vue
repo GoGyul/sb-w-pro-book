@@ -8,6 +8,7 @@ const emit = defineEmits(["close"]);
 const insertForm = reactive({
   userId: "",
   userPassword: "",
+  nickname: "",
   gender: "",
   birthDate: "",
 });
@@ -24,6 +25,7 @@ const doSignup = () => {
   const signUpData: CreateUserDto = {
     userId: insertForm.userId,
     userPassword: insertForm.userPassword,
+    nickname: insertForm.nickname,
     gender: insertForm.gender === "" ? null : insertForm.gender,
     birthDate: insertForm.birthDate === "" ? null : insertForm.birthDate,
   };
@@ -62,6 +64,13 @@ const emitClose = () => {
           type="password"
           v-model="insertForm.userPassword"
           placeholder="비밀번호 (필수)"
+          required
+          maxlength="10"
+        />
+        <input
+          type="text"
+          v-model="insertForm.nickname"
+          placeholder="닉네임 (필수)"
           required
           maxlength="10"
         />

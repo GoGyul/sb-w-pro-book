@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sp.web.book.board.movie.mapper.MvBoardMapper">
+
+    <select id="selectMvBoardList"  resultType="com.sp.web.book.board.movie.model.entity.MvBoardEntity">
+        SELECT
+               bno
+             , title
+             , content
+             , user_id
+             , category
+             , movie_title
+             , rating
+             , regdate
+             , updatedate
+             , is_deleted
+        FROM mv_board
+    </select>
+
+</mapper>

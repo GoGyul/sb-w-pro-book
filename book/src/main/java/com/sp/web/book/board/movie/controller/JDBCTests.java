@@ -1,4 +1,4 @@
-package com.sp.web.book.test.controller;
+package com.sp.web.book.board.movie.controller;
 
 import lombok.extern.java.Log;
 

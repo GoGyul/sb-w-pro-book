@@ -4,10 +4,16 @@ import LoginModal from "@/components/auth/LoginModal.vue";
 import SignUpModal from "@/components/auth/SignUpModal.vue";
 import { useAuthStore } from "@/stores/useAuthStore";
 import { useLogoutMutation } from "@/api/auth/logout/use/useLogoutMutation";
+import { useRouter } from "vue-router";
 
 const showLogin = ref(false);
 const showSignup = ref(false);
 const authStore = useAuthStore(); // ✅ store 인스턴스 사용
+const router = useRouter();
+
+const goHome = () => {
+  router.push("/");
+};
 
 const { mutate: logoutMutate, isPending, isError, error } = useLogoutMutation();
 
@@ -17,6 +23,7 @@ const doLogout = async () => {
   logoutMutate(authStore.accessToken, {
     onSuccess: () => {
       authStore.logout(); // ✅ 유저 상태 초기화
+      goHome();
     },
     onError: (error) => {
       console.error("로그아웃 실패:", error);

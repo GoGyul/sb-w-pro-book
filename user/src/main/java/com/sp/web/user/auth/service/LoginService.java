@@ -114,32 +114,42 @@ public class LoginService {
     }
 
     @Transactional
-    public LogoutResponseDto postLogout(HttpServletRequest request,HttpServletResponse response) {
-
+    public LogoutResponseDto postLogout(HttpServletRequest request, HttpServletResponse response) {
         String token = jwtUtil.resolveToken(request);
 
-        if(token == null || !jwtUtil.validateToken(token) ) {
-//            return new LogoutResponseDto(false, "유효하지 않은 토큰", null);
-            throw new IllegalArgumentException("토큰이 유효하지않음.");
+        // 토큰이 없는 경우에만 오류 처리
+        if(token == null) {
+            throw new IllegalArgumentException("토큰이 존재하지 않습니다.");
         }
 
-        String userId = jwtUtil.getUserIdFromToken(token);
-        redisLoginService.deleteRefreshToken(token);
+        // 토큰에서 사용자 ID 추출 시도
+        String userId;
+        try {
+            userId = jwtUtil.getUserIdFromToken(token);
+        } catch (Exception e) {
+            // 만료된 토큰이라도 쿠키는 삭제해야 함
+            clearRefreshTokenCookie(response);
+            return new LogoutResponseDto(true, "만료된 세션이 정리되었습니다.", null);
+        }
 
-        long expiration = jwtUtil.getExpiration(token);
-        redisLoginService.addToBlacklist(token,expiration);
+        // 레디스에서 리프레시 토큰 삭제 시도
+        try {
+            redisLoginService.deleteRefreshToken(token);
+        } catch (Exception e) {
+            log.warn("리프레시 토큰 삭제 실패: {}", e.getMessage());
+            // 오류가 발생해도 계속 진행
+        }
 
-        ResponseCookie expiredCookie = ResponseCookie.from("refreshToken","")
-                .httpOnly(true)
-                .secure(false)
-                .path("/")
-                .maxAge(0)
-                .sameSite("Lax")
-                .build();
-        response.addHeader("Set-Cookie", expiredCookie.toString());
+        // 유효한 토큰이면 블랙리스트에 추가
+        if (jwtUtil.validateToken(token)) {
+            long expiration = jwtUtil.getExpiration(token);
+            redisLoginService.addToBlacklist(token, expiration);
+        }
+
+        // 항상 리프레시 토큰 쿠키 삭제
+        clearRefreshTokenCookie(response);
 
         return new LogoutResponseDto(true, "로그아웃 성공", userId);
-
     }
 
     @Transactional
@@ -162,4 +172,17 @@ public class LoginService {
         return new ReissueResponseDto(true, newAccessToken, null, userId, "AccessToken 재발급 완료");
 
     }
+
+    // 리프레시 토큰 쿠키 삭제 메서드 분리
+    private void clearRefreshTokenCookie(HttpServletResponse response) {
+        ResponseCookie expiredCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0)
+                .sameSite("Lax")
+                .build();
+        response.addHeader("Set-Cookie", expiredCookie.toString());
+    }
+
 }

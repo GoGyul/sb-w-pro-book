@@ -12,11 +12,39 @@
              , user_id
              , category
              , movie_title
+             , views
              , rating
              , regdate
              , updatedate
              , is_deleted
-        FROM mv_board
+          FROM mv_board
+        ORDER BY bno desc
     </select>
+
+    <insert id="insertMvBoard" parameterType="com.sp.web.book.board.movie.model.dto.MvBoardDto">
+        INSERT INTO mv_board (
+            title,
+            category,
+            rating,
+            movie_title,
+            content,
+            user_id,
+            regdate,
+            updatedate,
+            is_deleted,
+            views
+        ) VALUES (
+                     #{title},
+                     #{category},
+                     #{rating},
+                     #{movieTitle},
+                     #{content},
+                     #{userId},
+                     NOW(),
+                     NOW(),
+                     0,
+                     0
+                 )
+    </insert>
 
 </mapper>

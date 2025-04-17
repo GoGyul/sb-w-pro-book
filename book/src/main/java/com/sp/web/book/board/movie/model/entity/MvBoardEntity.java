@@ -14,6 +14,7 @@ public class MvBoardEntity {
     private String category;
     private String movieTitle;
     private int rating;
+    private int views;
     private String regdate;
     private String updatedate;
     private int isDeleted;

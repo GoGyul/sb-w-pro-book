@@ -117,39 +117,49 @@ public class LoginService {
     public LogoutResponseDto postLogout(HttpServletRequest request, HttpServletResponse response) {
         String token = jwtUtil.resolveToken(request);
 
-        // 토큰이 없는 경우에만 오류 처리
-        if(token == null) {
-            throw new IllegalArgumentException("토큰이 존재하지 않습니다.");
+        // 토큰이 없는 경우 - 쿠키만 정리
+        if (token == null) {
+            log.info("로그아웃 요청 - 토큰 없음, 쿠키만 정리");
+            clearRefreshTokenCookie(response);
+            return new LogoutResponseDto(true, "세션 정보가 정리되었습니다.", null);
         }
 
-        // 토큰에서 사용자 ID 추출 시도
-        String userId;
+        String userId = null;
+        boolean isValidToken = false;
+
+        // 토큰 유효성 확인 및 사용자 ID 추출
         try {
             userId = jwtUtil.getUserIdFromToken(token);
+            isValidToken = jwtUtil.validateToken(token);
+            log.info("로그아웃 요청 - 사용자: {}, 유효한 토큰: {}", userId, isValidToken);
         } catch (Exception e) {
-            // 만료된 토큰이라도 쿠키는 삭제해야 함
-            clearRefreshTokenCookie(response);
-            return new LogoutResponseDto(true, "만료된 세션이 정리되었습니다.", null);
+            log.info("로그아웃 요청 - 만료되거나 유효하지 않은 토큰");
         }
 
-        // 레디스에서 리프레시 토큰 삭제 시도
+        // 리프레시 토큰 삭제 시도
         try {
             redisLoginService.deleteRefreshToken(token);
+            log.info("리프레시 토큰 삭제 성공");
         } catch (Exception e) {
             log.warn("리프레시 토큰 삭제 실패: {}", e.getMessage());
-            // 오류가 발생해도 계속 진행
         }
 
         // 유효한 토큰이면 블랙리스트에 추가
-        if (jwtUtil.validateToken(token)) {
-            long expiration = jwtUtil.getExpiration(token);
-            redisLoginService.addToBlacklist(token, expiration);
+        if (isValidToken) {
+            try {
+                long expiration = jwtUtil.getExpiration(token);
+                redisLoginService.addToBlacklist(token, expiration);
+                log.info("토큰을 블랙리스트에 추가 (만료 시간: {})", expiration);
+            } catch (Exception e) {
+                log.error("블랙리스트 추가 실패: {}", e.getMessage());
+            }
         }
 
         // 항상 리프레시 토큰 쿠키 삭제
         clearRefreshTokenCookie(response);
 
-        return new LogoutResponseDto(true, "로그아웃 성공", userId);
+        String message = userId != null ? "로그아웃 성공" : "만료된 세션이 정리되었습니다.";
+        return new LogoutResponseDto(true, message, userId);
     }
 
     @Transactional

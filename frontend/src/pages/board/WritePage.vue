@@ -2,16 +2,23 @@
 import HeaderComponent from "@/components/common/HeaderComponent.vue";
 import { ref, computed, reactive } from "vue";
 import { useRouter } from "vue-router";
+import {
+  MvBoardListResponseDto,
+  MvBoardDto,
+} from "@/types/board/mvboard/mvBoardListResponseDto";
+import { useAuthStore } from "@/stores/useAuthStore";
+import { useMvBoardMutation } from "@/api/board/movie/use/useMvBoardListQuery";
 
 const router = useRouter();
+const authStore = useAuthStore();
 
 const insertForm = reactive({
   title: "",
   category: "MOVIE",
-  rating: "",
+  rating: 0,
   movieTitle: "",
   content: "",
-  userId: "",
+  userId: authStore.userId,
 });
 
 // const title = ref("");
@@ -23,6 +30,13 @@ const insertForm = reactive({
 const isMovieReview = computed(() => insertForm.category === "MOVIE");
 const ratings = Array.from({ length: 10 }, (_, i) => (i + 1) * 0.5);
 
+const {
+  mutate: mvBoardMutation,
+  isPending,
+  isError,
+  error,
+} = useMvBoardMutation();
+
 const submitPost = () => {
   if (!insertForm.title.trim()) return alert("제목을 입력해주세요.");
   if (!insertForm.category) return alert("카테고리를 선택해주세요.");
@@ -31,7 +45,29 @@ const submitPost = () => {
   if (isMovieReview.value && !insertForm.rating)
     return alert("별점을 선택해주세요.");
   if (!insertForm.content.trim()) return alert("내용을 입력해주세요.");
-  router.push("/board"); // 게시판으로 이동
+
+  const mvBoardDto: MvBoardDto = {
+    title: insertForm.title,
+    content: insertForm.content,
+    userId: authStore.userId,
+    category: insertForm.category,
+    movieTitle: insertForm.movieTitle,
+    rating: insertForm.rating,
+  };
+
+  console.log(mvBoardDto);
+
+  // useMutation의 mutate 함수 호출
+  mvBoardMutation(mvBoardDto, {
+    onSuccess: (res) => {
+      alert("게시글 작성 성공");
+      router.push("/board"); // 게시판으로 이동
+    },
+    onError: (error) => {
+      console.error("❌ 작성실패", error);
+      alert("게시글 작성 실패");
+    },
+  });
 };
 </script>
 

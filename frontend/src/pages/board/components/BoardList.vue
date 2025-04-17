@@ -1,34 +1,21 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { useMvBoardListQuery } from "@/api/board/movie/use/useMvBoardListQuery";
 
-interface Post {
-  id: number;
-  title: string;
-  author: string;
-  views: number;
-}
-
-const posts = ref<Post[]>([]);
-
-// 테스트용 더미 데이터 20개 생성
-for (let i = 1; i <= 20; i++) {
-  posts.value.push({
-    id: i,
-    title: `게시글 제목 ${i}`,
-    author: `작성자${i}`,
-    views: Math.floor(Math.random() * 100), // 조회수 랜덤
-  });
-}
+// API 호출 (자동으로 실행됨!)
+const { data: mvBoardList, isLoading, isError } = useMvBoardListQuery();
 </script>
 
 <template>
   <div class="board-list">
-    <ul>
-      <li v-for="post in posts" :key="post.id" class="post-item">
+    <span>{{ mvBoardList }}</span>
+    <div v-if="isLoading">로딩 중...</div>
+    <div v-else-if="isError">에러가 발생했습니다.</div>
+    <ul v-else>
+      <li v-for="board in mvBoardList" :key="board.id" class="post-item">
         <div class="post-row">
-          <div class="post-title">{{ post.title }}</div>
-          <div class="post-author">{{ post.author }}</div>
-          <div class="post-views">{{ post.views }}</div>
+          <div class="post-title">{{ board.title }}</div>
+          <div class="post-author">{{ board.userId }}</div>
+          <div class="post-views">{{ board.views }}</div>
         </div>
       </li>
     </ul>

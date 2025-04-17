@@ -1,6 +1,7 @@
 package com.sp.web.book.board.movie.service;
 
 import com.sp.web.book.board.movie.mapper.MvBoardMapper;
+import com.sp.web.book.board.movie.model.dto.MvBoardDto;
 import com.sp.web.book.board.movie.model.dto.MvBoardListResponseDto;
 import com.sp.web.book.board.movie.model.entity.MvBoardEntity;
 import lombok.RequiredArgsConstructor;
@@ -31,4 +32,9 @@ public class MvBoardService {
 
     }
 
+    public Boolean postMvBoard(MvBoardDto dto) {
+
+       return mvBoardMapper.insertMvBoard(dto);
+
+    }
 }

@@ -6,19 +6,22 @@
 
     <select id="selectMvBoardList"  resultType="com.sp.web.book.board.movie.model.entity.MvBoardEntity">
         SELECT
-               bno
-             , title
-             , content
-             , user_id
-             , category
-             , movie_title
-             , views
-             , rating
-             , regdate
-             , updatedate
-             , is_deleted
-          FROM mv_board
-        ORDER BY bno desc
+            mvb.bno
+             , mvb.title
+             , mvb.content
+             , mvb.user_id
+             , mvb.category
+             , mvb.movie_title
+             , mvb.views
+             , mvb.rating
+             , mvb.regdate
+             , mvb.updatedate
+             , mvb.is_deleted
+             , mvu.nickname
+         FROM mv_board mvb
+         JOIN mv_user mvu
+           ON mvb.user_id = mvu.user_id
+        ORDER BY mvb.bno desc
         LIMIT #{size} OFFSET #{offset}
     </select>
 
@@ -52,5 +55,31 @@
                      0
                  )
     </insert>
+
+    <select id="selectMvBoardDetail" resultType="com.sp.web.book.board.movie.model.dto.MvBoardDetailReponseDto">
+        SELECT
+            mvb.bno,
+            mvb.title,
+            mvb.content,
+            mvb.user_id,
+            mvb.regdate,
+            mvb.updatedate,
+            mvb.category,
+            mvb.movie_title,
+            mvb.rating,
+            mvb.is_deleted,
+            mvb.views,
+            mvu.nickname
+        FROM mv_board mvb
+        JOIN mv_user mvu
+          ON mvb.user_id = mvu.user_id
+        WHERE mvb.bno = #{bno}
+    </select>
+
+    <update id="increaseViews" parameterType="int">
+        UPDATE mv_board
+        SET views = views + 1
+        WHERE bno = #{bno}
+    </update>
 
 </mapper>

@@ -18,5 +18,6 @@ public class MvBoardEntity {
     private String regdate;
     private String updatedate;
     private int isDeleted;
+    private String nickname;
 
 }

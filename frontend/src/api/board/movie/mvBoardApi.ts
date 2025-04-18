@@ -3,6 +3,7 @@ import { PageResponse } from "@/types/common/PageResponse";
 import {
   MvBoardListResponseDto,
   MvBoardDto,
+  MvBoardDetailResponseDto,
 } from "@/types/board/mvboard/mvBoardListResponseDto";
 
 export const mvBoardApi = {
@@ -14,6 +15,11 @@ export const mvBoardApi = {
       .get(`/board/movie/list?page=${page}&size=${size}`)
       .then((res) => res.data);
   },
+
+  getMvBoardDetail: (bno: number): Promise<MvBoardDetailResponseDto> => {
+    return apiClient.get(`/board/movie/detail/${bno}`).then((res) => res.data);
+  },
+
   postMvBoard: (mvBoardDto: MvBoardDto): Promise<boolean> => {
     return apiClient
       .post<boolean>("/board/movie/write", mvBoardDto)

@@ -6,12 +6,21 @@ import { PageResponse } from "@/types/common/PageResponse";
 import {
   MvBoardListResponseDto,
   MvBoardDto,
+  MvBoardDetailResponseDto,
 } from "@/types/board/mvboard/mvBoardListResponseDto";
 
 export function useMvBoardListQuery(page: Ref<number>, size: number) {
   return useQuery<PageResponse<MvBoardListResponseDto>>({
     queryKey: ["mvBoardList", page],
     queryFn: () => mvBoardApi.getMvBoardList(unref(page), size),
+  });
+}
+
+// 영화 게시판 상세 조회 쿼리
+export function useMvBoardDetailQuery(bno: number) {
+  return useQuery<MvBoardDetailResponseDto>({
+    queryKey: ["mvBoardDetail", bno],
+    queryFn: () => mvBoardApi.getMvBoardDetail(bno),
   });
 }
 

@@ -1,6 +1,7 @@
 package com.sp.web.book.board.movie.service;
 
 import com.sp.web.book.board.movie.mapper.MvBoardMapper;
+import com.sp.web.book.board.movie.model.dto.MvBoardDetailReponseDto;
 import com.sp.web.book.board.movie.model.dto.MvBoardDto;
 import com.sp.web.book.board.movie.model.dto.MvBoardListResponseDto;
 import com.sp.web.book.common.pagenation.dto.PageResponseDto;
@@ -45,6 +46,14 @@ public class MvBoardService {
         }
 
        return mvBoardMapper.insertMvBoard(dto);
+
+    }
+
+    public MvBoardDetailReponseDto getMvBoardDetail(int bno) {
+
+        mvBoardMapper.increaseViews(bno);
+
+        return mvBoardMapper.selectMvBoardDetail(bno);
 
     }
 }

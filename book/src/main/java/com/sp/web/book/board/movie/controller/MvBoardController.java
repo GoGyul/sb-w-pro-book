@@ -1,5 +1,6 @@
 package com.sp.web.book.board.movie.controller;
 
+import com.sp.web.book.board.movie.model.dto.MvBoardDetailReponseDto;
 import com.sp.web.book.board.movie.model.dto.MvBoardDto;
 import com.sp.web.book.board.movie.model.dto.MvBoardListResponseDto;
 import com.sp.web.book.common.pagenation.dto.PageResponseDto;
@@ -21,6 +22,13 @@ public class MvBoardController {
     private PageResponseDto<MvBoardListResponseDto> getMvBoardList (@ModelAttribute PageRequestDto pageRequestDto){
 
         return service.getMvBoardList(pageRequestDto);
+
+    }
+
+    @GetMapping("/movie/detail/{bno}")
+    private MvBoardDetailReponseDto getMvBoardDetail (@PathVariable int bno){
+
+        return service.getMvBoardDetail(bno);
 
     }
 

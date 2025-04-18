@@ -1,5 +1,6 @@
 package com.sp.web.book.board.movie.mapper;
 
+import com.sp.web.book.board.movie.model.dto.MvBoardDetailReponseDto;
 import com.sp.web.book.board.movie.model.dto.MvBoardDto;
 import com.sp.web.book.board.movie.model.entity.MvBoardEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -15,4 +16,8 @@ public interface MvBoardMapper {
     boolean insertMvBoard(MvBoardDto dto);
 
     long selectTotalCount();
+
+    MvBoardDetailReponseDto selectMvBoardDetail(int bno);
+
+    void increaseViews(int bno);
 }

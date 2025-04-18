@@ -1,14 +1,18 @@
 import apiClient from "../../axios";
+import { PageResponse } from "@/types/common/PageResponse";
 import {
   MvBoardListResponseDto,
   MvBoardDto,
 } from "@/types/board/mvboard/mvBoardListResponseDto";
 
 export const mvBoardApi = {
-  getMvBoardList: (): Promise<MvBoardListResponseDto[]> => {
+  getMvBoardList: (
+    page: number,
+    size: number
+  ): Promise<PageResponse<MvBoardListResponseDto>> => {
     return apiClient
-      .get<MvBoardListResponseDto[]>("/board/movie/list")
-      .then((response) => response.data);
+      .get(`/board/movie/list?page=${page}&size=${size}`)
+      .then((res) => res.data);
   },
   postMvBoard: (mvBoardDto: MvBoardDto): Promise<boolean> => {
     return apiClient

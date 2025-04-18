@@ -3,7 +3,9 @@ package com.sp.web.book.board.movie.service;
 import com.sp.web.book.board.movie.mapper.MvBoardMapper;
 import com.sp.web.book.board.movie.model.dto.MvBoardDto;
 import com.sp.web.book.board.movie.model.dto.MvBoardListResponseDto;
+import com.sp.web.book.common.pagenation.dto.PageResponseDto;
 import com.sp.web.book.board.movie.model.entity.MvBoardEntity;
+import com.sp.web.book.common.pagenation.dto.PageRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -20,19 +22,27 @@ public class MvBoardService {
     private final MvBoardMapper mvBoardMapper;
     private final ModelMapper modelMapper;
 
-    public List<MvBoardListResponseDto> getMvBoardList() {
+    public PageResponseDto<MvBoardListResponseDto> getMvBoardList(PageRequestDto pageRequestDto) {
 
-        List<MvBoardEntity> entities = mvBoardMapper.selectMvBoardList();
+        int offset = pageRequestDto.getOffset();
+        int size = pageRequestDto.getSize();
+        long totalCount = mvBoardMapper.selectTotalCount();
+
+        List<MvBoardEntity> entities = mvBoardMapper.selectMvBoardList(offset, size);
         // ModelMapper를 사용한 변환
         List<MvBoardListResponseDto> dtoList = entities.stream()
                 .map(entity -> modelMapper.map(entity, MvBoardListResponseDto.class))
                 .collect(Collectors.toList());
 
-        return dtoList;
+        return new PageResponseDto<>(dtoList, totalCount);
 
     }
 
     public Boolean postMvBoard(MvBoardDto dto) {
+
+        if(dto.getCategory().equals("ANYTINING")){
+            dto.setRating(null);
+        }
 
        return mvBoardMapper.insertMvBoard(dto);
 

@@ -55,6 +55,11 @@ const submitPost = () => {
     rating: insertForm.rating,
   };
 
+  if (insertForm.category === "ANYTHING") {
+    mvBoardDto.movieTitle = "";
+    mvBoardDto.rating = null;
+  }
+
   console.log(mvBoardDto);
 
   // useMutation의 mutate 함수 호출
@@ -74,6 +79,7 @@ const submitPost = () => {
 <template>
   <HeaderComponent />
   <div class="write-page">
+    <span>{{ insertForm }}</span>
     <h1>📝 글쓰기</h1>
 
     <div class="form-group">

@@ -20,5 +20,5 @@ export interface MvBoardDto {
   userId: string | null;
   category: string;
   movieTitle: string;
-  rating: number;
+  rating: number | null;
 }

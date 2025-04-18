@@ -9,7 +9,7 @@ public class MvBoardDto {
 
     private String title;
     private String category;
-    private int rating;
+    private Integer rating;
     private String movieTitle;
     private String content;
     private String userId;

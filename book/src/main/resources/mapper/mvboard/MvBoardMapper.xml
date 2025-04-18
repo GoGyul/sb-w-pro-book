@@ -19,6 +19,12 @@
              , is_deleted
           FROM mv_board
         ORDER BY bno desc
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="selectTotalCount" resultType="long">
+        SELECT COUNT(*)
+          FROM mv_board
     </select>
 
     <insert id="insertMvBoard" parameterType="com.sp.web.book.board.movie.model.dto.MvBoardDto">
